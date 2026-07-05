@@ -64,6 +64,12 @@ elif [[ "$OS" == "Linux" ]]; then
     PROFILE="cloud"
     LLM_MODEL="qwen3.5:9b"
     ok "Linux + NVIDIA GPU → profile=cloud, model=${LLM_MODEL}"
+  elif [[ "$IS_WSL" == false && -z "${DISPLAY:-}" ]]; then
+    # Headless server without a GPU: still expose the public URL,
+    # but CPU inference will be slow (minutes per application)
+    PROFILE="cloud"
+    warn "Headless Linux server without NVIDIA GPU → profile=cloud (public URL enabled)."
+    warn "No GPU detected — LLM inference will run on CPU and be slow."
   else
     PROFILE="local"
     ok "Linux CPU-only → profile=local, model=${LLM_MODEL}"

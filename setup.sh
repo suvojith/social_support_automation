@@ -351,16 +351,6 @@ fi
 # 6. docker compose up (healthchecks gate next steps)
 # ---------------------------------------------------------------------------
 step 6 "Start all services (~10 containers)" "~3-5 min on first run (image builds), ~1 min after"
-if [[ "$PROFILE" == "cloud" ]]; then
-  # Caddy needs a bcrypt hash of the basic-auth password before it starts.
-  # .env may carry a stale PROFILE from an earlier run — the detected one wins.
-  _DETECTED_PROFILE="$PROFILE"
-  source .env 2>/dev/null || true
-  PROFILE="$_DETECTED_PROFILE"
-  BASIC_AUTH_HASH=$(docker run --rm caddy:2-alpine caddy hash-password --plaintext "${API_PASSWORD:-change_me_in_prod}")
-  export BASIC_AUTH_HASH
-  ok "Basic-auth credentials hashed for the public URL"
-fi
 info "Starting: PostgreSQL, MongoDB, Qdrant, Neo4j, Langfuse, FastAPI, Streamlit, OpenWebUI..."
 docker compose --profile "${PROFILE}" up -d
 # Gate only on the app services — their dependencies (all databases, Langfuse)
@@ -410,7 +400,7 @@ else
     sleep 2
   done
   if [ -n "$TUNNEL_URL" ]; then
-    ok "Public URL:  ${TUNNEL_URL}  (gated by basic auth, survives this session)"
+    ok "Public URL:  ${TUNNEL_URL}  (open access, survives this session)"
     info "Tunnel log:  /tmp/cloudflared.log — restart with: nohup cloudflared tunnel --url http://localhost:80 > /tmp/cloudflared.log 2>&1 &"
   else
     warn "Tunnel did not return a URL in time. Check /tmp/cloudflared.log."
@@ -418,7 +408,4 @@ else
   fi
 fi
 echo ""
-source .env 2>/dev/null || true
-info "API username: ${API_USERNAME:-reviewer}"
-info "API password: ${API_PASSWORD:-see .env}"
 echo "=================================================================="

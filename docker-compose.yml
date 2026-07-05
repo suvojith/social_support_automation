@@ -253,7 +253,7 @@ services:
     profiles: ["seed"]
     restart: "no"
 
-  # ---- Caddy: reverse proxy + auto-HTTPS + basic auth (cloud profile uses this) ----
+  # ---- Caddy: reverse proxy + auto-HTTPS (cloud profile uses this) ----
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
@@ -265,9 +265,6 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy_data:/data
       - caddy_config:/config
-    environment:
-      API_USERNAME: ${API_USERNAME:-reviewer}
-      BASIC_AUTH_HASH: ${BASIC_AUTH_HASH:-}
 
 volumes:
   pgdata:

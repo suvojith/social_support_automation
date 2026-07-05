@@ -112,7 +112,7 @@ That's the whole install. `setup.sh` detects your hardware, installs Docker and 
 | Orchestration (LangGraph) | ✅ | Explicit state machine with conditional human-review routing — [`src/graph/workflow.py`](src/graph/workflow.py) |
 | Model hosting (Ollama, OpenWebUI) | ✅ | Ollama serves all 3 models natively (Metal-accelerated); OpenWebUI at :8080 |
 | Observability (Langfuse) | ✅ | Self-hosted v2 at :3000 traces every agent/LLM call |
-| Serving (FastAPI) | ✅ | Versioned `/v1` API, basic auth, idempotency keys, Swagger |
+| Serving (FastAPI) | ✅ | Versioned `/v1` API, idempotency keys, Swagger, optional auth at the proxy |
 | Front-end (Streamlit) | ✅ | Bilingual UI with User/Admin roles at :8501 |
 | Version control (GitHub) | ✅ | Public repo, incremental history, layered documentation |
 
@@ -261,14 +261,14 @@ Simulates the workflow sitting beside existing government systems: `GET /v1/regi
 | GET | `/v1/registry…` | Registry integration (above) |
 | GET | `/v1/admin/metrics` | CV metrics, bias report, evaluation report |
 
-All behind basic auth; interactive docs at `/docs`.
+Interactive docs at `/docs`; basic auth can be enabled at the Caddy proxy for gated deployments.
 
 ### UI — two roles
 - **Application User**: the clean flow — form, autofill buttons, uploads, decision card, status, chat, dashboard.
 - **Admin** (sidebar switch): everything above **plus** pipeline stage logs and timing during submission, per-application processing log (audit trail, validation findings, features, classifier output), the LLM grounding context and response times in chat, validation flags in the dashboard, and an **Evaluation tab** with classifier metrics, feature importances, fairness slices, and the full evaluation report.
 
 ### Security, privacy & fairness
-Local-only models and self-hosted tracing (no applicant data leaves the machine) · PII masked before persistence · basic auth everywhere (Caddy for public URLs) · append-only audit trail for appeals · no protected-class classifier inputs · demographic-parity check with published numbers · human-in-the-loop by design.
+Local-only models and self-hosted tracing (no applicant data leaves the machine) · PII masked before persistence · optional basic auth at the Caddy proxy for public URLs · append-only audit trail for appeals · no protected-class classifier inputs · demographic-parity check with published numbers · human-in-the-loop by design.
 
 <details>
 <summary><b>📁 Project layout · make commands · env vars</b></summary>

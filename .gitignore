@@ -59,3 +59,7 @@ Thumbs.db
 # Local media (demo video lives on YouTube)
 *.mov
 *.mp4
+
+# local planning docs
+AI Case Study.pdf
+Social_Support_Workflow_Automation_v4.docx

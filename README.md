@@ -11,6 +11,16 @@ An AI workflow for a government social security department that turns a **5–20
 
 <div align="center">
   <br/>
+  <a href="https://www.youtube.com/watch?v=r1OXes8rub8">
+    <img src="https://img.youtube.com/vi/r1OXes8rub8/maxresdefault.jpg" alt="Video demo — Social Support Workflow Automation" width="760"/>
+  </a>
+  <br/>
+  <a href="https://www.youtube.com/watch?v=r1OXes8rub8"><b>▶️&nbsp; Watch the video demo on YouTube</b></a>
+  <br/>
+</div>
+
+<div align="center">
+  <br/>
   <a href="solution_summary.pdf">
     <img src="https://img.shields.io/badge/📄_SOLUTION_SUMMARY-READ_THE_FULL_DESIGN_DOCUMENT_→-1d4ed8?style=for-the-badge&labelColor=0f172a" alt="Solution Summary (PDF)"/>
   </a>

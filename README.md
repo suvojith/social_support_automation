@@ -27,6 +27,12 @@ An applicant (or caseworker) submits an application with five supporting documen
   <img src="docs/architecture.svg" alt="Architecture" width="920"/>
 </p>
 
+## 🖥️ User Interface
+
+<p align="center">
+  <img src="docs/demo.gif" alt="User interface walkthrough — registry autofill, submission, status, chat, dashboard, and evaluation" width="920"/>
+</p>
+
 ---
 
 ## 🚀 Installation

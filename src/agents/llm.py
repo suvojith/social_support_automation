@@ -31,11 +31,11 @@ def chat(
     """Call the Ollama chat endpoint with a system + user message (ReAct reasoning)."""
     # Unique first token per request: successive prompts here share long prefixes
     # (same templates, different JSON), which has triggered KV-cache bleed in
-    # Ollama — answers resuming from a previous request's context. Forcing
-    # divergence at the start of the user turn prevents stale cache resumption.
+    # Ollama — answers resuming from a previous request's context. The marker
+    # lives in the system message so models never echo it into answers.
     messages = [
-        {"role": "system", "content": system},
-        {"role": "user", "content": f"[case-ref:{uuid.uuid4().hex[:8]}]\n{user}"},
+        {"role": "system", "content": f"[session:{uuid.uuid4().hex[:8]}]\n{system}"},
+        {"role": "user", "content": user},
     ]
     payload: dict[str, Any] = {
         "model": model or get_settings().llm_model,

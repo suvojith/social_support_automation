@@ -341,6 +341,9 @@ if [ ! -f .env ]; then
   fi
   ok ".env created. API_PASSWORD=${GEN_PW}"
 else
+  # Keep profile + models in sync when re-running on a different machine
+  sed -i.bak "s/^VISION_MODEL=.*/VISION_MODEL=${VISION_MODEL}/; s/^LLM_MODEL=.*/LLM_MODEL=${LLM_MODEL}/; s/^PROFILE=.*/PROFILE=${PROFILE}/" .env 2>/dev/null || true
+  rm -f .env.bak
   ok ".env already exists"
 fi
 
@@ -349,8 +352,11 @@ fi
 # ---------------------------------------------------------------------------
 step 6 "Start all services (~10 containers)" "~3-5 min on first run (image builds), ~1 min after"
 if [[ "$PROFILE" == "cloud" ]]; then
-  # Caddy needs a bcrypt hash of the basic-auth password before it starts
+  # Caddy needs a bcrypt hash of the basic-auth password before it starts.
+  # .env may carry a stale PROFILE from an earlier run — the detected one wins.
+  _DETECTED_PROFILE="$PROFILE"
   source .env 2>/dev/null || true
+  PROFILE="$_DETECTED_PROFILE"
   BASIC_AUTH_HASH=$(docker run --rm caddy:2-alpine caddy hash-password --plaintext "${API_PASSWORD:-change_me_in_prod}")
   export BASIC_AUTH_HASH
   ok "Basic-auth credentials hashed for the public URL"

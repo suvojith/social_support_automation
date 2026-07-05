@@ -263,7 +263,7 @@ Key env vars (full list in [`.env.example`](.env.example)): `LLM_MODEL`, `VISION
 
 ## 📚 Documentation
 
-- 📖 [Solution Summary](solution_summary.docx) (Word, ≤10 pages) — architecture & data flow, five-dimension tool justification, modular workflow breakdown, future improvements & integration · [markdown version](docs/solution_summary.md)
+- 📖 [Solution Summary](solution_summary.pdf) (PDF, ≤10 pages · [Word](solution_summary.docx)) — architecture & data flow, five-dimension tool justification, modular workflow breakdown, future improvements & integration
 - 🧪 [Sample Data Guide](SAMPLE_DATA_GUIDE.md) — the 15 registry citizens, expected outcomes, edge-case demos
 - 📊 [Evaluation Report](docs/evaluation_report.md) · [CV Metrics](docs/cv_metrics.json) · [Bias Report](docs/bias_report.json) · [E2E Report](docs/e2e_test_report.txt)
 

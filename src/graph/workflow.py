@@ -20,6 +20,7 @@ from src.agents.eligibility_agent import eligibility_node
 from src.agents.extraction_agent import extraction_node
 from src.agents.orchestrator import orchestrator_node
 from src.agents.validation_agent import validation_node
+from src.governance.tracing import observe
 from src.graph.state import ApplicationState
 
 
@@ -64,6 +65,7 @@ def build_workflow():
     return graph.compile()
 
 
+@observe(name="human-review-routing", capture_input=False)
 def _human_review_node(state: ApplicationState) -> dict[str, Any]:
     """Mark the application for human review — a routing outcome, not a failure.
 

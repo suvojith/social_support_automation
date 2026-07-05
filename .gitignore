@@ -55,3 +55,7 @@ caddy_config/
 
 # OS
 Thumbs.db
+
+# Local media (demo video lives on YouTube)
+*.mov
+*.mp4

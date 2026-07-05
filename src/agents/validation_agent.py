@@ -21,6 +21,7 @@ from typing import Any
 
 from src.agents.llm import chat_json
 from src.config.prompts import VALIDATION_SYSTEM, VALIDATION_USER_TEMPLATE
+from src.governance.tracing import observe
 from src.graph.state import ApplicationState
 from src.storage.neo4j import Neo4jStore
 
@@ -115,6 +116,7 @@ def _employment_flags(extracted: dict) -> list[dict]:
     return flags
 
 
+@observe(name="validation-agent", capture_input=False)
 def validation_node(state: ApplicationState) -> dict[str, Any]:
     """Cross-check extracted data across documents + run the Neo4j conflict query."""
     extracted = state.get("extracted_data", {})

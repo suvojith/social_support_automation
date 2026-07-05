@@ -18,6 +18,7 @@ from src.data.rubric import (
     is_borderline,
     wealth_band,
 )
+from src.governance.tracing import observe
 from src.graph.state import ApplicationState
 
 
@@ -62,6 +63,7 @@ def _build_features(extracted: dict) -> dict[str, Any]:
     }
 
 
+@observe(name="eligibility-agent", capture_input=False)
 def eligibility_node(state: ApplicationState) -> dict[str, Any]:
     """Apply the rubric + LLM reasoning to compute the eligibility signal."""
     extracted = state.get("extracted_data", {})

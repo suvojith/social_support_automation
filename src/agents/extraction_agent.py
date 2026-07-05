@@ -11,6 +11,7 @@ from __future__ import annotations
 from typing import Any
 
 from src.extraction import extract_document
+from src.governance.tracing import observe
 from src.graph.state import ApplicationState
 from src.storage.neo4j import Neo4jStore
 
@@ -49,6 +50,7 @@ def _sync_family_graph(app_id: str, extracted: dict[str, Any]):
         store.close()
 
 
+@observe(name="extraction-agent", capture_input=False)
 def extraction_node(state: ApplicationState) -> dict[str, Any]:
     """Extract structured fields from all uploaded documents."""
     app_id = state.get("application_id", "")

@@ -12,10 +12,12 @@ from typing import Any
 from src.agents.llm import chat_json
 from src.config.prompts import DECISION_SYSTEM, DECISION_USER_TEMPLATE
 from src.data.rubric import enablement_recommendation, explain_decision
+from src.governance.tracing import observe
 from src.graph.state import ApplicationState
 from src.models.classifier import predict
 
 
+@observe(name="decision-agent", capture_input=False)
 def decision_node(state: ApplicationState) -> dict[str, Any]:
     """Produce a recommendation: approve / soft_decline / human_review."""
     eligibility = state.get("eligibility_score", {})

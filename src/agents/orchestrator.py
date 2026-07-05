@@ -8,9 +8,11 @@ from __future__ import annotations
 
 from typing import Any
 
+from src.governance.tracing import observe
 from src.graph.state import ApplicationState
 
 
+@observe(name="orchestrator", capture_input=False)
 def orchestrator_node(state: ApplicationState) -> dict[str, Any]:
     """Initialize the workflow state and set the trace id."""
     import uuid

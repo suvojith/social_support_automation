@@ -17,6 +17,7 @@ import httpx
 from PIL import Image
 
 from src.config.settings import get_settings
+from src.governance.tracing import langfuse_context, observe
 
 VISION_MODEL = os.environ.get("VISION_MODEL", "minicpm-v:8b")
 
@@ -28,10 +29,12 @@ def _ollama_host() -> str:
     return host
 
 
+@observe(as_type="generation", name="vision-ocr", capture_input=False)
 def ocr_with_vision_model(image_bytes: bytes, prompt: str | None = None) -> str:
     """Send an image to the vision LLM for OCR / field extraction."""
     import uuid
 
+    langfuse_context.update_current_observation(model=VISION_MODEL, metadata={"image_bytes": len(image_bytes)})
     b64 = base64.b64encode(image_bytes).decode()
     user_prompt = prompt or (
         f"[scan-ref:{uuid.uuid4().hex[:8]}]\n"
@@ -71,6 +74,7 @@ def _parse_id_fields(text: str) -> dict[str, Any]:
     """Parse raw OCR text into structured Emirates ID fields."""
     import re
 
+    text = text.replace("*", "")  # vision models wrap labels in markdown emphasis
     fields: dict[str, Any] = {}
     m = re.search(r"Name[:\s]*(.+)", text, re.I)
     if m:
@@ -99,11 +103,11 @@ def extract_image(image_bytes: bytes, doc_type: str = "emirates_id") -> dict[str
     """
     try:
         raw = ocr_with_vision_model(image_bytes)
-        parsed = _parse_id_fields(raw) if doc_type == "emirates_id" else {}
+        parsed = _parse_id_fields(raw) if doc_type in ("emirates_id", "handwritten_form") else {}
         return {"raw_text": raw, "method": f"{VISION_MODEL}_vision", "parsed": parsed}
     except Exception as e:
         text = ocr_with_tesseract(image_bytes)
-        parsed = _parse_id_fields(text) if doc_type == "emirates_id" else {}
+        parsed = _parse_id_fields(text) if doc_type in ("emirates_id", "handwritten_form") else {}
         return {
             "raw_text": text,
             "method": "tesseract_fallback",

@@ -9,6 +9,7 @@ from typing import Any
 import httpx
 
 from src.config.settings import get_settings
+from src.governance.tracing import langfuse_context, observe
 
 
 def _host() -> str:
@@ -20,6 +21,7 @@ def _host() -> str:
     return host
 
 
+@observe(as_type="generation", name="ollama-chat")
 def chat(
     system: str,
     user: str,
@@ -49,6 +51,7 @@ def chat(
     if images:
         payload["messages"][-1]["images"] = images
 
+    langfuse_context.update_current_observation(model=payload["model"], metadata={"temperature": temperature})
     resp = httpx.post(f"{_host()}/api/chat", json=payload, timeout=180.0)
     resp.raise_for_status()
     return resp.json()["message"]["content"]

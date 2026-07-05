@@ -347,7 +347,7 @@ echo ""
 if [[ "$PROFILE" == "local" ]]; then
   info "Local UI:          http://localhost:8501"
   info "API docs (Swagger): http://localhost:8000/docs"
-  info "Langfuse:          http://localhost:3000"
+  info "Langfuse:          http://localhost:3000  (login: admin@sswa.local / sswa-admin-2026)"
   info "Neo4j browser:     http://localhost:7474"
   info "OpenWebUI:         http://localhost:8080"
   echo ""

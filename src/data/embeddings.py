@@ -7,8 +7,10 @@ import os
 import httpx
 
 from src.config.settings import get_settings
+from src.governance.tracing import observe
 
 
+@observe(name="embed", capture_output=False)
 def embed(text: str, model: str | None = None) -> list[float]:
     """Generate an embedding via Ollama's /api/embeddings endpoint."""
     s = get_settings()

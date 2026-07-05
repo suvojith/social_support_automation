@@ -43,8 +43,8 @@ class Settings(BaseSettings):
 
     # Langfuse
     langfuse_host: str = "http://langfuse:3000"
-    langfuse_public_key: str = "lf-pub-placeholder"
-    langfuse_secret_key: str = "lf-sec-placeholder"
+    langfuse_public_key: str = "pk-lf-sswa-demo"
+    langfuse_secret_key: str = "sk-lf-sswa-demo"
 
     # API auth
     api_username: str = "reviewer"

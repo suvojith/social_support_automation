@@ -13,6 +13,8 @@ Everything you need to test the app against data that is **actually present in t
 
 Re-seed anytime with `make seed` (or just the registry: `docker compose exec api python -m seeder.registry`).
 
+**Edge-case fixtures** (`data/samples/edge_cases/`): a **handwritten application form** (`handwritten_form.png` — pen-style handwriting, extracted by the vision OCR) and a **bilingual Arabic/English Emirates ID** (`arabic_emirates_id.png`). Upload either through the UI, or run their spot-checks with `make test`.
+
 ## The 3-click test flow
 
 1. Open the UI → in the **sidebar**, pick a citizen from **Sample citizen (demo)** (or type a name / Emirates ID into the form).

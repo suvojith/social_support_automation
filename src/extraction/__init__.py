@@ -46,11 +46,14 @@ def extract_document(
         result["raw"] = raw
         result["parsed"] = _parse_credit_report(raw)
 
-    elif doc_type == "emirates_id":
+    elif doc_type in ("emirates_id", "handwritten_form"):
         if content:
             ocr_result = extract_image(content, doc_type)
             result["raw"] = ocr_result["raw_text"]
-            result["parsed"] = ocr_result.get("parsed", {})
+            parsed = dict(ocr_result.get("parsed", {}))
+            if doc_type == "handwritten_form":
+                parsed.update(_parse_form_fields(result["raw"]))
+            result["parsed"] = parsed
             result["ocr_method"] = ocr_result.get("method", "vision")
         else:
             result["raw"] = ""
@@ -74,6 +77,24 @@ def extract_document(
         result["parsed"] = {}
 
     return result
+
+
+def _parse_form_fields(text: str) -> dict:
+    """Extract the form fields a handwritten application carries beyond identity."""
+    import re
+
+    text = text.replace("*", "")  # vision models wrap labels in markdown emphasis
+    fields: dict = {}
+    m = re.search(r"Address[:\s]*(.+)", text, re.I)
+    if m:
+        fields["address"] = m.group(1).strip()
+    m = re.search(r"Employment[:\s]*(\w+)", text, re.I)
+    if m:
+        fields["employment_status"] = m.group(1).strip()
+    m = re.search(r"Family members[:\s]*(\d+)", text, re.I)
+    if m:
+        fields["family_members_declared"] = int(m.group(1))
+    return fields
 
 
 def _parse_bank_statement(text: str) -> dict:

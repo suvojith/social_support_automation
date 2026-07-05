@@ -13,10 +13,12 @@ from typing import Any
 from src.agents.llm import chat
 from src.config.prompts import CHAT_SYSTEM, CHAT_USER_TEMPLATE
 from src.data.embeddings import embed
+from src.governance.tracing import observe
 from src.graph.state import ApplicationState
 from src.storage.qdrant import QdrantStore
 
 
+@observe(name="chat-agent", capture_input=False)
 def chat_node(state: ApplicationState) -> dict[str, Any]:
     """Answer a caseworker's question about this application, grounded in its decision record."""
     chat_history = state.get("chat_history", [])

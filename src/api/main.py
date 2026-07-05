@@ -30,6 +30,8 @@ from src.api.schemas import (
     DecisionResponse,
     StatusResponse,
 )
+from src.governance.tracing import flush as flush_traces
+from src.governance.tracing import langfuse_context, observe
 from src.graph.workflow import get_workflow
 from src.storage.mongo import MongoStore
 from src.storage.postgres import PostgresClient
@@ -45,6 +47,23 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+
+@observe(name="application-workflow", capture_input=False)
+def _run_workflow(app_id: str, initial_state: dict[str, Any]) -> dict[str, Any]:
+    """One Langfuse trace per application, with every agent nested inside it."""
+    langfuse_context.update_current_trace(name=f"application {app_id}", session_id=app_id, tags=["apply"])
+    workflow = get_workflow()
+    return workflow.invoke(initial_state)
+
+
+@observe(name="case-chat", capture_input=False)
+def _run_chat(state: dict[str, Any]) -> dict[str, Any]:
+    from src.agents.chat_agent import chat_node
+
+    app_id = state.get("application_id", "")
+    langfuse_context.update_current_trace(name=f"chat {app_id}", session_id=app_id, tags=["chat"])
+    return chat_node(state)
 
 
 def _request_fingerprint(req: ApplyWithUploads) -> str:
@@ -125,8 +144,7 @@ async def apply(req: ApplyWithUploads, credentials: HTTPBasicCredentials = Depen
     }
 
     try:
-        workflow = get_workflow()
-        final_state = workflow.invoke(initial_state)
+        final_state = _run_workflow(app_id, initial_state)
 
         # Persist decision
         decision = final_state.get("decision", {})
@@ -157,13 +175,13 @@ async def apply(req: ApplyWithUploads, credentials: HTTPBasicCredentials = Depen
         raise HTTPException(status_code=500, detail=f"Workflow error: {e}")
     finally:
         pg.close()
+        flush_traces()
 
 
 @app.post("/v1/chat", response_model=dict)
 async def chat(req: ChatRequest, credentials: HTTPBasicCredentials = Depends(security)):
     """Interactive chat with the chat agent (enablement recommendations)."""
     require_auth(credentials)
-    from src.agents.chat_agent import chat_node
 
     # Load the application's features from the decision
     pg = PostgresClient()
@@ -191,11 +209,13 @@ async def chat(req: ChatRequest, credentials: HTTPBasicCredentials = Depends(sec
     }
 
     try:
-        result = chat_node(state)
+        result = _run_chat(state)
         response_text = result["chat_history"][-1]["content"]
         return {"application_id": req.application_id, "response": response_text}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Chat error: {e}")
+    finally:
+        flush_traces()
 
 
 @app.get("/v1/status/{app_id}", response_model=StatusResponse)

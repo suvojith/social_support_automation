@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import io
+from pathlib import Path
 
 import pytest
 
@@ -51,6 +52,37 @@ def test_emirates_id_image_ocr():
         assert "raw" in result
     except Exception as e:
         pytest.skip(f"Ollama not available for OCR test: {e}")
+
+
+def test_handwritten_form_ocr():
+    """Handwritten application form — identity and form fields via vision OCR.
+
+    Skipped when no OCR backend is reachable, like the other image tests.
+    """
+    path = Path("data/samples/edge_cases/handwritten_form.png")
+    if not path.exists():
+        pytest.skip("handwritten fixture not present")
+    try:
+        result = extract_document("handwritten_form", content=path.read_bytes(), filename=path.name)
+    except Exception as e:
+        pytest.skip(f"OCR backend unavailable: {e}")
+    parsed = result["parsed"]
+    assert parsed.get("emirates_id") == "784-1990-8834567-3"
+    assert "blooshi" in (parsed.get("name") or "").lower()
+
+
+def test_arabic_labeled_id_ocr():
+    """Bilingual (Arabic/English) Emirates ID — the bilingual extraction requirement."""
+    path = Path("data/samples/edge_cases/arabic_emirates_id.png")
+    if not path.exists():
+        pytest.skip("Arabic fixture not present")
+    try:
+        result = extract_document("emirates_id", content=path.read_bytes(), filename=path.name)
+    except Exception as e:
+        pytest.skip(f"OCR backend unavailable: {e}")
+    parsed = result["parsed"]
+    assert parsed.get("emirates_id") == "784-1979-9945678-4"
+    assert "suwaid" in (parsed.get("name") or "").lower()
 
 
 def test_resume_extraction():

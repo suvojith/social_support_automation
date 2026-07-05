@@ -112,6 +112,11 @@ start_docker_daemon() {
   else
     systemctl enable --now docker 2>/dev/null || sudo systemctl enable --now docker 2>/dev/null \
       || service docker start 2>/dev/null || sudo service docker start 2>/dev/null || true
+    # No working service manager (minimal VMs, some containers): run dockerd directly
+    if ! docker info &>/dev/null && command -v dockerd &>/dev/null; then
+      info "No service manager available — launching dockerd directly..."
+      nohup dockerd >/var/log/dockerd.log 2>&1 &
+    fi
   fi
   for _ in $(seq 1 45); do
     docker info &>/dev/null && return 0
@@ -130,7 +135,14 @@ if ! docker info &>/dev/null; then
     warn "Docker requires elevated permissions on this machine — using sudo for docker commands."
     docker() { sudo docker "$@"; }
   elif ! start_docker_daemon; then
-    err "Could not start the Docker daemon automatically. Start it manually and re-run."
+    if [[ -f /.dockerenv ]]; then
+      err "This environment is itself an unprivileged container (e.g. a RunPod/managed GPU pod),"
+      err "so a Docker daemon cannot run inside it. This stack needs a real virtual machine."
+      err "Use a VM-based GPU provider instead — Lambda Labs, AWS EC2 (g5.xlarge), GCP (L4),"
+      err "or a Vast.ai 'VM' instance — then re-run: bash setup.sh"
+    else
+      err "Could not start the Docker daemon automatically. Check /var/log/dockerd.log, start it manually, and re-run."
+    fi
     exit 1
   fi
 fi

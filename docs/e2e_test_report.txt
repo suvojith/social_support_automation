@@ -1,0 +1,134 @@
+================================================================================
+  E2E APP TEST REPORT — Social Support Workflow Automation
+  Run at: 2026-07-05 19:37:46
+  API: http://localhost:8000
+================================================================================
+
+────────────────────────────────────────────────────────────────────────────────
+  PHASE 1: Service Health Checks
+────────────────────────────────────────────────────────────────────────────────
+  [✅] FastAPI              http://localhost:8000/health                  → PASS
+  [✅] Streamlit UI         http://localhost:8501/_stcore/health          → PASS
+  [✅] Langfuse             http://localhost:3000                         → PASS
+
+────────────────────────────────────────────────────────────────────────────────
+  PHASE 2: Application Submission (3 test cases)
+────────────────────────────────────────────────────────────────────────────────
+
+  [1/3] Case A — Clean Approve (low income, low wealth, unemployed)
+       Applicant: Ahmed Al Mansoori
+       Emirates ID: 784-1990-1234567-1
+       Documents: 5 files (bank_statement, credit_report, emirates_id, resume, assets_liabilities)
+       Expected: approve
+       ✅ Submitted in 24.6s
+       Application ID: APP-4CB5B7F4
+       Recommendation: approve
+       Confidence: 0.9803
+       Enablement: ['upskilling']
+       Expected match: PASS
+
+  [2/3] Case B — Soft Decline (high income, high wealth, employed)
+       Applicant: Sultan Al Nahyan
+       Emirates ID: 784-1985-9876543-2
+       Documents: 5 files (bank_statement, credit_report, emirates_id, resume, assets_liabilities)
+       Expected: soft_decline
+       ✅ Submitted in 24.4s
+       Application ID: APP-E35304B6
+       Recommendation: soft_decline
+       Confidence: 0.9957
+       Enablement: ['career_counseling']
+       Expected match: PASS
+
+  [3/3] Case C — Human Review (borderline: income near cutoff + address mismatch)
+       Applicant: Mariam Al Suwaidi
+       Emirates ID: 784-1995-4567890-3
+       Documents: 5 files (bank_statement, credit_report, emirates_id, resume, assets_liabilities)
+       Expected: any
+       ✅ Submitted in 27.7s
+       Application ID: APP-D12D76C1
+       Recommendation: human_review
+       Confidence: 0.8701
+       Enablement: ['job_matching']
+       Expected match: N/A (any acceptable)
+
+────────────────────────────────────────────────────────────────────────────────
+  PHASE 3: Idempotency Test (resubmit Case A with same key)
+────────────────────────────────────────────────────────────────────────────────
+  [✅] First submission ID:  APP-4CB5B7F4
+  [✅] Retry submission ID:     APP-4CB5B7F4
+  [✅] Idempotency: PASS — same ID returned
+
+────────────────────────────────────────────────────────────────────────────────
+  PHASE 4: Status & Decision Retrieval
+────────────────────────────────────────────────────────────────────────────────
+
+  Case A — Clean Approve (low income, low wealth, unemployed)
+       App ID: APP-4CB5B7F4
+       ✅ Status: approve
+       ✅ Decision: approve
+          Confidence: 0.9803
+          Rationale: The applicant meets all financial eligibility criteria: per_capita income (1500.0 AED) falls within the Low band (<3000)...
+          SHAP top features:
+            • income_used: 1.6709
+            • net_worth: 0.6435
+            • per_capita_income: 0.5298
+
+  Case B — Soft Decline (high income, high wealth, employed)
+       App ID: APP-E35304B6
+       ✅ Status: soft_decline
+       ✅ Decision: soft_decline
+          Confidence: 0.9957
+          Rationale: The applicant is classified as 'soft_decline' because their per_capita income (22,000 AED) and net worth (370,000 AED) b...
+          SHAP top features:
+            • net_worth: -2.7624
+            • income_from_credit_report: -1.9484
+            • per_capita_income: -0.5149
+
+  Case C — Human Review (borderline: income near cutoff + address mismatch)
+       App ID: APP-D12D76C1
+       ✅ Status: human_review
+       ✅ Decision: human_review
+          Confidence: 0.8701
+          Rationale: Borderline eligibility score or unresolved cross-document conflicts. Routed to human review queue for caseworker assessm...
+          SHAP top features:
+            • per_capita_income: 0.7497
+            • net_worth: 0.3893
+            • income_from_credit_report: -0.3219
+
+────────────────────────────────────────────────────────────────────────────────
+  PHASE 5: Chat Interaction (enablement recommendations)
+────────────────────────────────────────────────────────────────────────────────
+
+  Case A — Clean Approve (low income, low wealth, unemployed)
+       App ID: APP-4CB5B7F4
+       ✅ Chat response received (1012 chars)
+          Response: Hello! Based on your current status as unemployed, we recommend focusing on **upskilling** to build a strong foundation for future employment. Here are three tailored programs available to you:
+
+1.  *...
+
+  Case B — Soft Decline (high income, high wealth, employed)
+       App ID: APP-E35304B6
+       ✅ Chat response received (436 chars)
+          Response: Based on your profile, you are currently employed with a stable income above our standard threshold. Therefore, we do not recommend upskilling or job matching at this time.
+
+However, to support your l...
+
+────────────────────────────────────────────────────────────────────────────────
+  PHASE 6: Applications List
+────────────────────────────────────────────────────────────────────────────────
+  ✅ Retrieved 50 applications
+  Test applications found: 3
+    • APP-D12D76C1: Mariam Al Suwaidi — status: human_review
+    • APP-E35304B6: Sultan Al Nahyan — status: soft_decline
+    • APP-4CB5B7F4: Ahmed Al Mansoori — status: approve
+
+================================================================================
+  SUMMARY
+================================================================================
+  Applications submitted: 3 (3 passed, 0 failed)
+  Idempotency test:       PASS
+  ✅ Case A — Clean Approve (low income, low wealth, un → approve         (conf: 0.9803, match: PASS)
+  ✅ Case B — Soft Decline (high income, high wealth, e → soft_decline    (conf: 0.9957, match: PASS)
+  ✅ Case C — Human Review (borderline: income near cut → human_review    (conf: 0.8701, match: N/A (any acceptable))
+
+================================================================================

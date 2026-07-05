@@ -1,0 +1,259 @@
+name: sswa
+
+# Social Support Workflow Automation — docker-compose
+# Dual profiles: local (Mac Apple Silicon / CPU) and cloud (Linux + NVIDIA GPU)
+# setup.sh auto-detects the profile. `make up` uses PROFILE=local by default.
+
+x-common-env: &common-env
+  POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+  POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+  POSTGRES_USER: ${POSTGRES_USER:-sswa}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_in_prod}
+  POSTGRES_DB: ${POSTGRES_DB:-sswa}
+  MONGO_HOST: ${MONGO_HOST:-mongo}
+  MONGO_PORT: ${MONGO_PORT:-27017}
+  MONGO_USER: ${MONGO_USER:-sswa}
+  MONGO_PASSWORD: ${MONGO_PASSWORD:-change_me_in_prod}
+  MONGO_DB: ${MONGO_DB:-sswa}
+  QDRANT_HOST: ${QDRANT_HOST:-qdrant}
+  QDRANT_PORT: ${QDRANT_PORT:-6333}
+  NEO4J_HOST: ${NEO4J_HOST:-neo4j}
+  NEO4J_PORT: ${NEO4J_PORT:-7687}
+  NEO4J_USER: ${NEO4J_USER:-neo4j}
+  NEO4J_PASSWORD: ${NEO4J_PASSWORD:-change_me_in_prod}
+  LANGFUSE_HOST: ${LANGFUSE_HOST:-http://langfuse:3000}
+  LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:-lf-pub-placeholder}
+  LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:-lf-sec-placeholder}
+  OLLAMA_HOST: ${OLLAMA_HOST:-http://host.docker.internal:11434}
+  LLM_MODEL: ${LLM_MODEL:-qwen3.5:9b-mlx}
+  EMBED_MODEL: ${EMBED_MODEL:-bge-m3}
+  API_USERNAME: ${API_USERNAME:-reviewer}
+  API_PASSWORD: ${API_PASSWORD:-change_me_in_prod}
+  N_SYNTHETIC_APPLICANTS: ${N_SYNTHETIC_APPLICANTS:-200}
+  LABEL_NOISE_RATE: ${LABEL_NOISE_RATE:-0.12}
+  RANDOM_SEED: ${RANDOM_SEED:-42}
+
+services:
+
+  # ---- PostgreSQL: source of truth (applications, decisions, audit, idempotency) ----
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-sswa}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_in_prod}
+      POSTGRES_DB: ${POSTGRES_DB:-sswa}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-sswa} -d ${POSTGRES_DB:-sswa}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ---- MongoDB: raw docs + extracted JSON + GridFS images ----
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-sswa}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-change_me_in_prod}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodata:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.runCommand({ping:1}).ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ---- Qdrant: vector DB for eligibility rules + enablement programs ----
+  qdrant:
+    image: qdrant/qdrant:latest
+    restart: unless-stopped
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c ':> /dev/tcp/127.0.0.1/6333' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ---- Neo4j: family/employment graph (family members as individual Person nodes) ----
+  neo4j:
+    image: neo4j:5-community
+    restart: unless-stopped
+    environment:
+      NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-change_me_in_prod}
+      NEO4J_PLUGINS: '["apoc"]'
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u ${NEO4J_USER:-neo4j} -p ${NEO4J_PASSWORD:-change_me_in_prod} 'RETURN 1' || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  # ---- Langfuse v2 (self-hosted) — its own Postgres, no ClickHouse/Redis/S3 ----
+  langfuse-db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: langfuse
+      POSTGRES_PASSWORD: langfuse
+      POSTGRES_DB: langfuse
+    volumes:
+      - langfuse_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U langfuse"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  langfuse:
+    image: langfuse/langfuse:2
+    restart: unless-stopped
+    depends_on:
+      langfuse-db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://langfuse:langfuse@langfuse-db:5432/langfuse
+      NEXTAUTH_SECRET: 1QZOoFagkXI8A0UMqsctIxgD4Uc71FzDTCXPe0fQwME
+      SALT: F7dY5p8Ww3i5zQWGdxzANy9y29CDf3xtFWnK18cLhs
+      ENCRYPTION_KEY: 50d0d69ce1d31c20187889b342e21a6d19de23cd2b0ab9b1f360513b8b702244
+      NEXTAUTH_URL: http://localhost:3000
+      PORT: 3000
+      CLICKHOUSE_URL: ""
+      DISABLE_TELEMETRY: "true"
+    ports:
+      - "3000:3000"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://$${HOSTNAME}:3000 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  # ---- FastAPI: model serving + agent endpoints ----
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+      langfuse:
+        condition: service_healthy
+    environment: *common-env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app/src
+      - ./seeder:/app/seeder
+      - ./models:/app/models
+      - ./data:/app/data
+      - ./tests:/app/tests
+      - ./docs:/app/docs
+    command: uvicorn src.api.main:app --host 0.0.0.0 --port 8000
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  # ---- Streamlit: product UI (bilingual EN/AR) ----
+  ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      <<: *common-env
+      API_BASE: http://api:8000
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./src:/app/src
+    command: streamlit run src/ui/app.py --server.port=8501 --server.address=0.0.0.0 --browser.gatherUsageStats=false
+
+  # ---- OpenWebUI: model interaction UI (case study explicitly names it) ----
+  # Dev-time tool for testing prompts; Streamlit remains the product UI.
+  openwebui:
+    image: ghcr.io/open-webui/open-webui:main
+    restart: unless-stopped
+    environment:
+      OLLAMA_BASE_URL: ${OLLAMA_HOST:-http://host.docker.internal:11434}
+    ports:
+      - "8080:8080"
+    volumes:
+      - openwebui_data:/app/backend/data
+
+  # ---- Seeder: one-shot init (synthetic data + KB + graph + classifier + bias check) ----
+  seeder:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    environment: *common-env
+    volumes:
+      - ./src:/app/src
+      - ./seeder:/app/seeder
+      - ./models:/app/models
+      - ./data:/app/data
+      - ./docs:/app/docs
+    command: python -m seeder.main
+    profiles: ["seed"]
+    restart: "no"
+
+  # ---- Caddy: reverse proxy + auto-HTTPS + basic auth (cloud profile uses this) ----
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    profiles: ["cloud"]
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    environment:
+      API_USERNAME: ${API_USERNAME:-reviewer}
+      API_PASSWORD: ${API_PASSWORD:-change_me_in_prod}
+
+volumes:
+  pgdata:
+  mongodata:
+  qdrant_data:
+  neo4j_data:
+  langfuse_pg:
+  caddy_data:
+  caddy_config:
+  openwebui_data:

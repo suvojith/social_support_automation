@@ -1,0 +1,197 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 800" font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <linearGradient id="gPage" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#f1f5f9"/>
+    </linearGradient>
+    <linearGradient id="gBlue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#60a5fa"/><stop offset="1" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="gPurple" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#6d28d9"/>
+    </linearGradient>
+    <linearGradient id="gGreen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4ade80"/><stop offset="1" stop-color="#15803d"/>
+    </linearGradient>
+    <linearGradient id="gGreenDark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#22c55e"/><stop offset="1" stop-color="#166534"/>
+    </linearGradient>
+    <linearGradient id="gTeal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2dd4bf"/><stop offset="1" stop-color="#0f766e"/>
+    </linearGradient>
+    <linearGradient id="gAmber" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbbf24"/><stop offset="1" stop-color="#b45309"/>
+    </linearGradient>
+    <linearGradient id="gGray" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#94a3b8"/><stop offset="1" stop-color="#475569"/>
+    </linearGradient>
+    <linearGradient id="gBandGreen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f0fdf4"/><stop offset="1" stop-color="#dcfce7"/>
+    </linearGradient>
+    <linearGradient id="gBandTeal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f0fdfa"/><stop offset="1" stop-color="#ccfbf1"/>
+    </linearGradient>
+    <linearGradient id="gBandAmber" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fffbeb"/><stop offset="1" stop-color="#fef3c7"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <marker id="arrowLight" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+    </marker>
+  </defs>
+
+  <!-- backdrop -->
+  <rect x="1" y="1" width="1158" height="798" rx="18" fill="url(#gPage)" stroke="#e2e8f0" stroke-width="2"/>
+
+  <!-- ===== client + serving, centered column ===== -->
+  <g>
+    <rect x="424" y="30" width="312" height="66" rx="12" fill="url(#gBlue)"/>
+    <rect x="424" y="30" width="312" height="66" rx="12" fill="none" stroke="#1e40af" stroke-opacity="0.35"/>
+    <text x="580" y="57" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">🖥️  Streamlit UI  ·  :8501</text>
+    <text x="580" y="78" text-anchor="middle" fill="#dbeafe" font-size="12">English / العربية  ·  User &amp; Admin views</text>
+  </g>
+  <line x1="580" y1="96" x2="580" y2="124" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <g>
+    <rect x="404" y="128" width="352" height="66" rx="12" fill="url(#gPurple)"/>
+    <rect x="404" y="128" width="352" height="66" rx="12" fill="none" stroke="#5b21b6" stroke-opacity="0.35"/>
+    <text x="580" y="155" text-anchor="middle" fill="#ffffff" font-size="15" font-weight="700">⚡  FastAPI  ·  :8000</text>
+    <text x="580" y="176" text-anchor="middle" fill="#ede9fe" font-size="12">/v1 REST  ·  basic auth  ·  idempotency keys</text>
+  </g>
+  <line x1="580" y1="194" x2="580" y2="222" stroke="#475569" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- curved dashed connector API -> Chat -->
+  <path d="M 756 161 C 950 161 1030 200 1042 282" fill="none" stroke="#64748b" stroke-width="1.6" stroke-dasharray="5 4" marker-end="url(#arrowLight)"/>
+  <text x="950" y="150" text-anchor="middle" fill="#64748b" font-size="11">chat about a decided case</text>
+
+  <!-- ===== orchestration band ===== -->
+  <g>
+    <rect x="40" y="226" width="1080" height="172" rx="14" fill="url(#gBandGreen)" stroke="#86efac" stroke-width="1.5"/>
+    <text x="60" y="254" fill="#14532d" font-size="14" font-weight="700">🤖  LangGraph agentic orchestration</text>
+
+    <rect x="62" y="292" width="126" height="66" rx="33" fill="url(#gGreenDark)"/>
+    <text x="125" y="320" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">Master</text>
+    <text x="125" y="338" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">Orchestrator</text>
+    <line x1="188" y1="325" x2="214" y2="325" stroke="#166534" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="216" y="292" width="168" height="66" rx="10" fill="url(#gGreen)"/>
+    <text x="300" y="317" text-anchor="middle" fill="#ffffff" font-size="13.5" font-weight="700">📄 Extraction</text>
+    <text x="300" y="337" text-anchor="middle" fill="#ecfdf5" font-size="11">pypdf · vision OCR · pandas</text>
+    <line x1="384" y1="325" x2="410" y2="325" stroke="#166534" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="412" y="292" width="168" height="66" rx="10" fill="url(#gGreen)"/>
+    <text x="496" y="317" text-anchor="middle" fill="#ffffff" font-size="13.5" font-weight="700">🔎 Validation</text>
+    <text x="496" y="337" text-anchor="middle" fill="#ecfdf5" font-size="11">6 cross-checks · Reflexion</text>
+    <line x1="580" y1="325" x2="606" y2="325" stroke="#166534" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="608" y="292" width="168" height="66" rx="10" fill="url(#gGreen)"/>
+    <text x="692" y="317" text-anchor="middle" fill="#ffffff" font-size="13.5" font-weight="700">⚖️ Eligibility</text>
+    <text x="692" y="337" text-anchor="middle" fill="#ecfdf5" font-size="11">rubric + LLM reasoning</text>
+    <line x1="776" y1="325" x2="802" y2="325" stroke="#166534" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <rect x="804" y="292" width="168" height="66" rx="10" fill="url(#gGreen)"/>
+    <text x="888" y="317" text-anchor="middle" fill="#ffffff" font-size="13.5" font-weight="700">🧑‍⚖️ Decision</text>
+    <text x="888" y="337" text-anchor="middle" fill="#ecfdf5" font-size="11">classifier + SHAP</text>
+
+    <rect x="994" y="292" width="106" height="66" rx="10" fill="url(#gGreenDark)"/>
+    <text x="1047" y="317" text-anchor="middle" fill="#ffffff" font-size="13.5" font-weight="700">💬 Chat</text>
+    <text x="1047" y="337" text-anchor="middle" fill="#ecfdf5" font-size="11">rules-first RAG</text>
+  </g>
+
+  <!-- ===== connectors down ===== -->
+  <line x1="320" y1="398" x2="320" y2="448" stroke="#475569" stroke-width="2.4" marker-end="url(#arrow)"/>
+  <text x="334" y="428" text-anchor="start" fill="#475569" font-size="11.5" font-weight="600">agents read / write purpose-built stores</text>
+
+  <line x1="795" y1="398" x2="795" y2="448" stroke="#64748b" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#arrowLight)"/>
+  <text x="809" y="428" text-anchor="start" fill="#64748b" font-size="11.5">every LLM · OCR · embedding call</text>
+
+  <line x1="1060" y1="398" x2="1060" y2="448" stroke="#64748b" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#arrowLight)"/>
+  <text x="1074" y="428" text-anchor="start" fill="#64748b" font-size="11.5">traces</text>
+
+  <!-- ===== data layer ===== -->
+  <g>
+    <rect x="40" y="452" width="560" height="200" rx="14" fill="url(#gBandTeal)" stroke="#5eead4" stroke-width="1.5"/>
+    <text x="60" y="480" fill="#134e4a" font-size="14" font-weight="700">🗄️  Data layer</text>
+
+    <g>
+      <path d="M 62 512 v 96 a 62 13 0 0 0 124 0 v -96" fill="url(#gTeal)"/>
+      <ellipse cx="124" cy="512" rx="62" ry="13" fill="#5eead4"/>
+      <text x="124" y="548" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="700">PostgreSQL</text>
+      <text x="124" y="566" text-anchor="middle" fill="#ccfbf1" font-size="10">applications · decisions</text>
+      <text x="124" y="580" text-anchor="middle" fill="#ccfbf1" font-size="10">audit · citizen registry</text>
+    </g>
+    <g>
+      <path d="M 200 512 v 96 a 62 13 0 0 0 124 0 v -96" fill="url(#gTeal)"/>
+      <ellipse cx="262" cy="512" rx="62" ry="13" fill="#5eead4"/>
+      <text x="262" y="548" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="700">MongoDB</text>
+      <text x="262" y="566" text-anchor="middle" fill="#ccfbf1" font-size="10">raw documents</text>
+      <text x="262" y="580" text-anchor="middle" fill="#ccfbf1" font-size="10">+ GridFS images</text>
+    </g>
+    <g>
+      <path d="M 338 512 v 96 a 62 13 0 0 0 124 0 v -96" fill="url(#gTeal)"/>
+      <ellipse cx="400" cy="512" rx="62" ry="13" fill="#5eead4"/>
+      <text x="400" y="548" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="700">Neo4j</text>
+      <text x="400" y="566" text-anchor="middle" fill="#ccfbf1" font-size="10">family graph ·</text>
+      <text x="400" y="580" text-anchor="middle" fill="#ccfbf1" font-size="10">conflict queries</text>
+    </g>
+    <g>
+      <path d="M 476 512 v 96 a 62 13 0 0 0 124 0 v -96" fill="url(#gTeal)"/>
+      <ellipse cx="538" cy="512" rx="62" ry="13" fill="#5eead4"/>
+      <text x="538" y="548" text-anchor="middle" fill="#ffffff" font-size="12.5" font-weight="700">Qdrant</text>
+      <text x="538" y="566" text-anchor="middle" fill="#ccfbf1" font-size="10">eligibility rules ·</text>
+      <text x="538" y="580" text-anchor="middle" fill="#ccfbf1" font-size="10">enablement programs</text>
+    </g>
+  </g>
+
+  <!-- ===== local models ===== -->
+  <g>
+    <rect x="630" y="452" width="330" height="200" rx="14" fill="url(#gBandAmber)" stroke="#fcd34d" stroke-width="1.5"/>
+    <text x="650" y="480" fill="#78350f" font-size="14" font-weight="700">🧠  Local models — Ollama :11434</text>
+    <text x="650" y="498" fill="#92400e" font-size="11">fully self-hosted · no external APIs</text>
+
+    <rect x="650" y="516" width="92" height="92" rx="10" fill="url(#gAmber)"/>
+    <text x="696" y="552" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">qwen3.5</text>
+    <text x="696" y="568" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">:9b</text>
+    <text x="696" y="588" text-anchor="middle" fill="#fef3c7" font-size="10.5">reasoning</text>
+
+    <rect x="758" y="516" width="92" height="92" rx="10" fill="url(#gAmber)"/>
+    <text x="804" y="552" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">minicpm-v</text>
+    <text x="804" y="568" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">:8b</text>
+    <text x="804" y="588" text-anchor="middle" fill="#fef3c7" font-size="10.5">vision OCR</text>
+
+    <rect x="866" y="516" width="92" height="92" rx="10" fill="url(#gAmber)"/>
+    <text x="912" y="552" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">bge-m3</text>
+    <text x="912" y="568" text-anchor="middle" fill="#ffffff" font-size="12" font-weight="700">EN / AR</text>
+    <text x="912" y="588" text-anchor="middle" fill="#fef3c7" font-size="10.5">embeddings</text>
+  </g>
+
+  <!-- ===== langfuse ===== -->
+  <g>
+    <rect x="990" y="482" width="140" height="140" rx="14" fill="url(#gGray)"/>
+    <text x="1060" y="534" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="700">🔍 Langfuse</text>
+    <text x="1060" y="556" text-anchor="middle" fill="#e2e8f0" font-size="11.5">:3000</text>
+    <text x="1060" y="580" text-anchor="middle" fill="#e2e8f0" font-size="11.5">end-to-end</text>
+    <text x="1060" y="596" text-anchor="middle" fill="#e2e8f0" font-size="11.5">tracing</text>
+  </g>
+
+  <!-- ===== outcomes strip ===== -->
+  <g>
+    <line x1="580" y1="652" x2="580" y2="652"/>
+    <rect x="40" y="686" width="1080" height="84" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+    <text x="60" y="716" fill="#334155" font-size="13" font-weight="700">Every decision ships with</text>
+    <text x="60" y="740" fill="#64748b" font-size="12">SHAP explainability · figure-based rationale · append-only audit trail · enablement plan</text>
+
+    <rect x="620" y="700" width="150" height="54" rx="10" fill="url(#gGreen)"/>
+    <text x="695" y="723" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">✅ Approve</text>
+    <text x="695" y="742" text-anchor="middle" fill="#ecfdf5" font-size="10.5">clear eligibility</text>
+
+    <rect x="786" y="700" width="150" height="54" rx="10" fill="url(#gAmber)"/>
+    <text x="861" y="723" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">🟡 Soft decline</text>
+    <text x="861" y="742" text-anchor="middle" fill="#fef3c7" font-size="10.5">enablement still offered</text>
+
+    <rect x="952" y="700" width="168" height="54" rx="10" fill="url(#gGray)"/>
+    <text x="1036" y="723" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="700">🟠 Human review</text>
+    <text x="1036" y="742" text-anchor="middle" fill="#e2e8f0" font-size="10.5">borderline / conflicts</text>
+  </g>
+</svg>

@@ -1,0 +1,18 @@
+# Caddyfile — reverse proxy + basic auth for the public tunnel (cloud profile)
+# setup.sh generates the hashed basic-auth credentials into this file on first run.
+
+:80 {
+	# Basic auth gates everything behind the public URL
+	basicauth {
+		{$API_USERNAME} {$BASIC_AUTH_HASH} {$BASIC_AUTH_REALM:-SSWA Demo}
+	}
+
+	# Streamlit UI at root
+	reverse_proxy ui:8501
+
+	# FastAPI at /api/*
+	handle /api/* {
+		strip_prefix /api
+		reverse_proxy api:8000
+	}
+}

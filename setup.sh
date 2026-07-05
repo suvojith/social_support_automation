@@ -201,6 +201,23 @@ else
   ok "Ollama is running"
 fi
 
+# On Linux, containers reach the host's Ollama through the docker bridge —
+# the default loopback-only bind would refuse them
+if [[ "$OS" == "Linux" ]]; then
+  if command -v systemctl &>/dev/null && systemctl list-unit-files ollama.service &>/dev/null; then
+    (mkdir -p /etc/systemd/system/ollama.service.d 2>/dev/null || sudo mkdir -p /etc/systemd/system/ollama.service.d)
+    printf "[Service]\nEnvironment=OLLAMA_HOST=0.0.0.0\n" > /tmp/ollama_override.conf
+    (cp /tmp/ollama_override.conf /etc/systemd/system/ollama.service.d/override.conf 2>/dev/null \
+      || sudo cp /tmp/ollama_override.conf /etc/systemd/system/ollama.service.d/override.conf)
+    (systemctl daemon-reload && systemctl restart ollama) 2>/dev/null \
+      || (sudo systemctl daemon-reload && sudo systemctl restart ollama) 2>/dev/null || true
+    sleep 3
+  elif ! curl -s http://localhost:11434/api/tags &>/dev/null; then
+    OLLAMA_HOST=0.0.0.0 nohup ollama serve > /var/log/ollama.log 2>&1 &
+    sleep 5
+  fi
+fi
+
 # Verify Ollama is actually responding
 if ! curl -s http://localhost:11434/api/tags &>/dev/null; then
   err "Ollama daemon is not responding at http://localhost:11434"
@@ -301,11 +318,9 @@ if [ ! -f .env ]; then
   else
     GEN_PW=$(date +%s | sha256sum | base64 | head -c 16)
   fi
-  # Set the vision model in .env
-  if grep -q "^VISION_MODEL=" .env; then
-    sed -i.bak "s/^VISION_MODEL=.*/VISION_MODEL=${VISION_MODEL}/" .env 2>/dev/null || true
-    rm -f .env.bak
-  fi
+  # Persist the detected profile + models so later `make up` runs match
+  sed -i.bak "s/^VISION_MODEL=.*/VISION_MODEL=${VISION_MODEL}/; s/^LLM_MODEL=.*/LLM_MODEL=${LLM_MODEL}/; s/^PROFILE=.*/PROFILE=${PROFILE}/" .env 2>/dev/null || true
+  rm -f .env.bak
   # Replace the placeholder password
   if [[ "$OS" == "Darwin" ]]; then
     sed -i '' "s/^API_PASSWORD=.*/API_PASSWORD=${GEN_PW}/" .env 2>/dev/null || true

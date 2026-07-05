@@ -256,7 +256,7 @@ services:
       - caddy_config:/config
     environment:
       API_USERNAME: ${API_USERNAME:-reviewer}
-      API_PASSWORD: ${API_PASSWORD:-change_me_in_prod}
+      BASIC_AUTH_HASH: ${BASIC_AUTH_HASH:-}
 
 volumes:
   pgdata:

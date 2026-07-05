@@ -321,6 +321,13 @@ fi
 # 6. docker compose up (healthchecks gate next steps)
 # ---------------------------------------------------------------------------
 step 6 "Start all services (~10 containers)" "~3-5 min on first run (image builds), ~1 min after"
+if [[ "$PROFILE" == "cloud" ]]; then
+  # Caddy needs a bcrypt hash of the basic-auth password before it starts
+  source .env 2>/dev/null || true
+  BASIC_AUTH_HASH=$(docker run --rm caddy:2-alpine caddy hash-password --plaintext "${API_PASSWORD:-change_me_in_prod}")
+  export BASIC_AUTH_HASH
+  ok "Basic-auth credentials hashed for the public URL"
+fi
 info "Starting: PostgreSQL, MongoDB, Qdrant, Neo4j, Langfuse, FastAPI, Streamlit, OpenWebUI..."
 docker compose --profile "${PROFILE}" up -d --wait
 ok "All services are healthy:"
@@ -358,12 +365,19 @@ if [[ "$PROFILE" == "local" ]]; then
     cmd.exe /c start http://localhost:8501 2>/dev/null || true
   fi
 else
-  info "Starting public tunnel (cloudflared)..."
-  TUNNEL_URL=$(cloudflared tunnel --url http://localhost:80 2>&1 | grep -oE "https://[a-z0-9-]+\.trycloudflare\.com" | head -1 || true)
+  info "Starting public tunnel (cloudflared, runs in the background)..."
+  nohup cloudflared tunnel --url http://localhost:80 > /tmp/cloudflared.log 2>&1 &
+  TUNNEL_URL=""
+  for _ in $(seq 1 30); do
+    TUNNEL_URL=$(grep -oE "https://[a-z0-9-]+\.trycloudflare\.com" /tmp/cloudflared.log 2>/dev/null | head -1 || true)
+    [ -n "$TUNNEL_URL" ] && break
+    sleep 2
+  done
   if [ -n "$TUNNEL_URL" ]; then
-    info "Public URL:  ${TUNNEL_URL} (gated by basic auth)"
+    ok "Public URL:  ${TUNNEL_URL}  (gated by basic auth, survives this session)"
+    info "Tunnel log:  /tmp/cloudflared.log — restart with: nohup cloudflared tunnel --url http://localhost:80 > /tmp/cloudflared.log 2>&1 &"
   else
-    warn "Tunnel did not return a URL in time. Check cloudflared logs."
+    warn "Tunnel did not return a URL in time. Check /tmp/cloudflared.log."
     info "Local UI:    http://localhost:8501"
   fi
 fi

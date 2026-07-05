@@ -21,6 +21,16 @@ An AI workflow for a government social security department that turns a **5–20
   <br/><br/>
 </div>
 
+<p align="center">
+  <b>📑 Contents:</b>&nbsp;
+  <a href="#%EF%B8%8F-user-interface">User Interface</a> ·
+  <a href="#-installation">Installation</a> ·
+  <a href="#-how-this-meets-the-evaluation-criteria">Evaluation Criteria</a> ·
+  <a href="#-evaluation-metrics">Evaluation Metrics</a> ·
+  <a href="#%EF%B8%8F-how-it-works">How It Works</a> ·
+  <a href="#-documentation">Documentation</a>
+</p>
+
 An applicant (or caseworker) submits an application with five supporting documents — bank statement, credit report, Emirates ID, resume, assets/liabilities spreadsheet. Six LangGraph agents extract the data, cross-check it for inconsistencies, score eligibility with an explainable ML model, and return **approve**, **soft decline**, or **route to a human caseworker** — always with SHAP explainability and an economic-enablement plan (upskilling, job matching, or career counseling). Everything runs on locally hosted models: no applicant data ever leaves the machine.
 
 <p align="center">

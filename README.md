@@ -9,6 +9,18 @@
 
 An AI workflow for a government social security department that turns a **5–20 working day** application process into an explained decision **in ~25 seconds**.
 
+<div align="center">
+  <br/>
+  <a href="solution_summary.pdf">
+    <img src="https://img.shields.io/badge/📄_SOLUTION_SUMMARY-READ_THE_FULL_DESIGN_DOCUMENT_→-1d4ed8?style=for-the-badge&labelColor=0f172a" alt="Solution Summary (PDF)"/>
+  </a>
+  &nbsp;
+  <a href="solution_summary.docx">
+    <img src="https://img.shields.io/badge/DOCX-2b579a?style=for-the-badge&logo=microsoftword&logoColor=white" alt="Solution Summary (Word)"/>
+  </a>
+  <br/><br/>
+</div>
+
 An applicant (or caseworker) submits an application with five supporting documents — bank statement, credit report, Emirates ID, resume, assets/liabilities spreadsheet. Six LangGraph agents extract the data, cross-check it for inconsistencies, score eligibility with an explainable ML model, and return **approve**, **soft decline**, or **route to a human caseworker** — always with SHAP explainability and an economic-enablement plan (upskilling, job matching, or career counseling). Everything runs on locally hosted models: no applicant data ever leaves the machine.
 
 <p align="center">

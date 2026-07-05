@@ -344,8 +344,11 @@ if [[ "$PROFILE" == "cloud" ]]; then
   ok "Basic-auth credentials hashed for the public URL"
 fi
 info "Starting: PostgreSQL, MongoDB, Qdrant, Neo4j, Langfuse, FastAPI, Streamlit, OpenWebUI..."
-docker compose --profile "${PROFILE}" up -d --wait
-ok "All services are healthy:"
+docker compose --profile "${PROFILE}" up -d
+# Gate only on the app services — their dependencies (all databases, Langfuse)
+# must be healthy first anyway; side tools like OpenWebUI never block the deploy
+docker compose --profile "${PROFILE}" up -d --wait api ui
+ok "All services are up:"
 docker compose --profile "${PROFILE}" ps --format "        {{.Name}}  →  {{.Status}}"
 
 # ---------------------------------------------------------------------------

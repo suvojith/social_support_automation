@@ -358,7 +358,6 @@ def run_e2e_tests():
                 log(f"       Confidence: {confidence}")
                 log(f"       Enablement: {enablement if enablement else 'none'}")
 
-                # Check if recommendation matches expected
                 if expected == "any":
                     match = "N/A (any acceptable)"
                 else:
@@ -546,7 +545,6 @@ def run_e2e_tests():
     report = "\n".join(report_lines)
     print(report)
 
-    # Save report to file
     Path("docs/e2e_test_report.txt").write_text(report)
     print("\nReport saved to docs/e2e_test_report.txt")
 

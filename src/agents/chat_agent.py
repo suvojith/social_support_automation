@@ -24,7 +24,6 @@ def chat_node(state: ApplicationState) -> dict[str, Any]:
     enablement_types = state.get("enablement_recs", [])
     decision_record = state.get("decision_record") or {}
 
-    # Get the latest user message
     latest = chat_history[-1] if chat_history else {"role": "user", "content": ""}
     user_message = latest.get("content", "")
 
@@ -67,7 +66,6 @@ def chat_node(state: ApplicationState) -> dict[str, Any]:
         temperature=0.1,  # case notes should be consistent, not creative
     )
 
-    # Append the assistant response to chat history
     new_history = list(chat_history) + [{"role": "assistant", "content": response}]
 
     return {"chat_history": new_history}

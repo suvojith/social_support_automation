@@ -77,34 +77,65 @@ export PROFILE LLM_MODEL VISION_MODEL EMBED_MODEL
 # ---------------------------------------------------------------------------
 # 2. Check + install dependencies
 # ---------------------------------------------------------------------------
-step 2 "Check dependencies (Docker, Ollama)" "~10 sec, or ~2 min if Ollama needs installing"
+step 2 "Check dependencies (Docker, Ollama)" "~10 sec, or a few minutes if Docker/Ollama need installing"
 
-# Docker
+# Docker — installed and started automatically when missing, so the same
+# script works on a fresh Linux server, a Mac, or WSL2 without Docker Desktop.
+install_docker() {
+  if [[ "$OS" == "Darwin" ]]; then
+    if ! command -v brew &>/dev/null; then
+      err "Homebrew is required to install Docker on macOS. Install it from https://brew.sh and re-run."
+      exit 1
+    fi
+    info "Installing Docker CLI + colima (no Docker Desktop required)..."
+    brew install docker docker-compose colima
+    mkdir -p "$HOME/.docker/cli-plugins"
+    ln -sfn "$(brew --prefix)/opt/docker-compose/bin/docker-compose" "$HOME/.docker/cli-plugins/docker-compose"
+  elif [[ "$IS_WINDOWS" == true && "$IS_WSL" == false ]]; then
+    err "On native Windows, install Docker Desktop (https://docs.docker.com/desktop/install/windows-install/) or use WSL2, then re-run."
+    exit 1
+  else
+    info "Installing Docker Engine (get.docker.com)..."
+    curl -fsSL https://get.docker.com | sh
+  fi
+  ok "Docker installed"
+}
+
+start_docker_daemon() {
+  info "Starting the Docker daemon..."
+  if [[ "$OS" == "Darwin" ]]; then
+    if command -v colima &>/dev/null; then
+      colima start --cpu 4 --memory 8 --disk 40 || true
+    else
+      open -a Docker 2>/dev/null || true   # Docker Desktop, if that's what is installed
+    fi
+  else
+    systemctl enable --now docker 2>/dev/null || sudo systemctl enable --now docker 2>/dev/null \
+      || service docker start 2>/dev/null || sudo service docker start 2>/dev/null || true
+  fi
+  for _ in $(seq 1 45); do
+    docker info &>/dev/null && return 0
+    sleep 2
+  done
+  return 1
+}
+
 if ! command -v docker &>/dev/null; then
-  err "Docker is not installed or not in PATH."
-  if [[ "$IS_WINDOWS" == true ]]; then
-    err "On Windows: install Docker Desktop from https://docs.docker.com/desktop/install/windows-install/"
-  elif [[ "$OS" == "Darwin" ]]; then
-    err "On macOS: install Docker Desktop from https://docs.docker.com/desktop/install/mac-install/"
-  else
-    err "On Linux: install Docker from https://docs.docker.com/engine/install/"
-  fi
-  exit 1
+  install_docker
 fi
-if ! docker info &>/dev/null 2>&1; then
-  err "Docker daemon is not running."
-  if [[ "$IS_WINDOWS" == true ]]; then
-    err "On Windows/WSL: start Docker Desktop, ensure WSL2 integration is enabled in Settings → Resources → WSL Integration."
-  elif [[ "$OS" == "Darwin" ]]; then
-    err "On macOS: start Docker Desktop."
-  else
-    err "On Linux: run 'sudo systemctl start docker'."
+
+if ! docker info &>/dev/null; then
+  # Non-root Linux user without docker-group membership: fall back to sudo
+  if sudo -n docker info &>/dev/null 2>&1; then
+    warn "Docker requires elevated permissions on this machine — using sudo for docker commands."
+    docker() { sudo docker "$@"; }
+  elif ! start_docker_daemon; then
+    err "Could not start the Docker daemon automatically. Start it manually and re-run."
+    exit 1
   fi
-  exit 1
 fi
 ok "Docker is running ($(docker --version))"
 
-# Docker Compose
 if docker compose version &>/dev/null 2>&1; then
   ok "Docker Compose $(docker compose version --short)"
 else

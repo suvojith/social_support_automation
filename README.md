@@ -19,7 +19,7 @@ An applicant (or caseworker) submits an application with five supporting documen
 
 ## 🚀 Installation
 
-**Prerequisites:** [Docker Desktop](https://docs.docker.com/get-docker/) running · ~20 GB free disk · macOS ([Homebrew](https://brew.sh)), Linux, or Windows/WSL2.
+**Prerequisites:** ~20 GB free disk · macOS ([Homebrew](https://brew.sh)), Linux, or Windows/WSL2. Docker and Ollama are installed automatically by setup.sh if missing (Docker Engine on Linux/WSL, colima on macOS — no Docker Desktop required).
 
 ```bash
 git clone https://github.com/suvojith/social_support_automation
@@ -27,7 +27,7 @@ cd social_support_automation
 bash setup.sh
 ```
 
-That's the whole install. `setup.sh` detects your hardware, installs Ollama, pulls the 3 models, starts ~10 containers, seeds all four databases, trains the classifier, and opens the UI — with per-step time estimates in the log (first run ~15–25 min, mostly model downloads; later runs ~1–2 min).
+That's the whole install. `setup.sh` detects your hardware, installs Docker and Ollama if needed, pulls the 3 models, starts ~10 containers, seeds all four databases, trains the classifier, and opens the UI — with per-step time estimates in the log (first run ~15–25 min, mostly model downloads; later runs ~1–2 min).
 
 | Opens at | What |
 |---|---|
@@ -263,7 +263,7 @@ Key env vars (full list in [`.env.example`](.env.example)): `LLM_MODEL`, `VISION
 
 ## 📚 Documentation
 
-- 📖 [Solution Summary](docs/solution_summary.md) — architecture, five-dimension tool justification, workflow breakdown, future improvements & integration
+- 📖 [Solution Summary](solution_summary.docx) (Word, ≤10 pages) — architecture & data flow, five-dimension tool justification, modular workflow breakdown, future improvements & integration · [markdown version](docs/solution_summary.md)
 - 🧪 [Sample Data Guide](SAMPLE_DATA_GUIDE.md) — the 15 registry citizens, expected outcomes, edge-case demos
 - 📊 [Evaluation Report](docs/evaluation_report.md) · [CV Metrics](docs/cv_metrics.json) · [Bias Report](docs/bias_report.json) · [E2E Report](docs/e2e_test_report.txt)
 

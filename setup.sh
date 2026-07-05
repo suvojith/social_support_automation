@@ -31,6 +31,7 @@ echo "=================================================================="
 step 1 "Detect environment" "a few seconds"
 OS="$(uname -s)"
 ARCH="$(uname -m)"
+PROFILE_OVERRIDE="${PROFILE:-}"
 PROFILE="local"
 LLM_MODEL="qwen3.5:9b"
 VISION_MODEL="minicpm-v:8b"
@@ -76,6 +77,11 @@ elif [[ "$OS" == "Linux" ]]; then
   fi
 else
   warn "Unknown OS: $OS — defaulting to profile=local, model=qwen3.5:9b"
+fi
+
+if [[ -n "$PROFILE_OVERRIDE" ]]; then
+  PROFILE="$PROFILE_OVERRIDE"
+  warn "Profile forced via PROFILE=${PROFILE}"
 fi
 
 export PROFILE LLM_MODEL VISION_MODEL EMBED_MODEL

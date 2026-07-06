@@ -11,6 +11,16 @@ An AI workflow for a government social security department that turns a **5–20
 
 <div align="center">
   <br/>
+  <a href="https://anyway-addition-washing-cardiff.trycloudflare.com">
+    <img src="https://img.shields.io/badge/🚀_LIVE_DEMO-OPEN_THE_APP_→-16a34a?style=for-the-badge&labelColor=0f172a" alt="Live demo"/>
+  </a>
+  <br/>
+  <a href="https://anyway-addition-washing-cardiff.trycloudflare.com"><b>anyway-addition-washing-cardiff.trycloudflare.com</b></a> — hosted and pre-loaded with sample citizens, no login needed
+  <br/><br/>
+</div>
+
+<div align="center">
+  <br/>
   <a href="https://www.youtube.com/watch?v=r1OXes8rub8">
     <img src="https://img.youtube.com/vi/r1OXes8rub8/maxresdefault.jpg" alt="Video demo — Social Support Workflow Automation" width="760"/>
   </a>
